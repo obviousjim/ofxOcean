@@ -50,8 +50,8 @@ ofxOcean::ofxOcean()
     fftInputBuf = NULL;
     fftOutputBuf = NULL;
 
-    width = 32;
-	height = 32;
+    width = 64;
+	height = 64;
 
     windSpeed = 40;
     waveSpeed = 1.0;

@@ -24,7 +24,6 @@ ofxOceanTile::~ofxOceanTile()
     if(mesh != NULL){
 		delete mesh;
 	}
-    
 }
 
 void ofxOceanTile::setup()
@@ -56,5 +55,5 @@ void ofxOceanTile::draw()
 }
 
 void ofxOceanTile::drawWireframe(){
-    mesh->drawElements(GL_LINE_STRIP, indexcount);    
+    mesh->drawElements(GL_LINES, indexcount);    
 }

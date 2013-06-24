@@ -238,6 +238,7 @@ void ofxOceanRenderer::draw()
     glPushAttrib(GL_ENABLE_BIT);
     glEnable(GL_DEPTH_TEST);
     
+	/*
     oceanShader.begin();
     ofVec3f lightNormalized = lightDirection.normalized();
     oceanShader.setUniform3f("sunDirection", lightNormalized.x, lightNormalized.y, lightNormalized.z);
@@ -275,23 +276,25 @@ void ofxOceanRenderer::draw()
 		
 		reflectionTexture->getTextureReference().bind();
 	}
-		
+	*/
+	ofSetSmoothLighting(false);
 	for(int LOD = 0; LOD < max_LOD; LOD++) {
         for(int k = 0; k < tiles_LOD[LOD].size(); k++) {
             ofxOceanTile* tile = tiles_LOD[LOD][k];
             tile->draw();
         }
     }
+	ofSetSmoothLighting(true);
 	
-    if(reflectionTexture != NULL){
-		glActiveTexture(GL_TEXTURE1);
-		reflectionTexture->getTextureReference().unbind();
-	}
-	
-    if(bumpTexture != NULL){
-		glActiveTexture(GL_TEXTURE0);
-        bumpTexture->unbind();
-    }
+//    if(reflectionTexture != NULL){
+//		glActiveTexture(GL_TEXTURE1);
+//		reflectionTexture->getTextureReference().unbind();
+//	}
+//	
+//    if(bumpTexture != NULL){
+//		glActiveTexture(GL_TEXTURE0);
+//        bumpTexture->unbind();
+//    }
     
     oceanShader.end();
     

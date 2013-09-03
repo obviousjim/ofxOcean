@@ -22,7 +22,8 @@ class ofxOceanTile
     void update();
     void draw();
     void drawWireframe();
-    
+    void drawVertices();
+	
 	ofVec3f position;
     
     int vertexcount;

@@ -21,9 +21,11 @@ class ofxOceanRenderer
     //ocean must already be initialized. # of tiles set level of detail
     void setup(ofxOcean* ocean, int tilesWide, int tilesTall); 
     void update();
+	
     void draw(); //uses shader
     void drawWireframe();
-    
+    void drawVertices();
+	
     void clearTiles();
     void setBumpTexture(string filename);
 //	void setBumpTexture(ofBaseHasTexture* bumpTexture);

@@ -55,5 +55,11 @@ void ofxOceanTile::draw()
 }
 
 void ofxOceanTile::drawWireframe(){
-    mesh->drawElements(GL_LINES, indexcount);    
+	mesh->drawElements(GL_LINES, indexcount);
+	
 }
+
+void ofxOceanTile::drawVertices(){
+	mesh->drawElements(GL_POINTS, indexcount);
+}
+

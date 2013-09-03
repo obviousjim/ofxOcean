@@ -29,6 +29,7 @@ class ofxOcean
 	void setup();
 	void update();
 
+    ofVec3f floatingPosition(ofVec3f position, bool considerChoppy = true);
     ofVec3f floatingPosition(float u, float v, bool considerChoppy = true);
     float waterHeight(float u, float v);
     float choppyOffset(float u, float v);

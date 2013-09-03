@@ -307,6 +307,10 @@ float ofxOcean::getLowestWave()
 	return lowestWave;
 }
 
+ofVec3f ofxOcean::floatingPosition(ofVec3f position, bool considerChoppy){
+	return floatingPosition(position.x, position.z, considerChoppy);
+}
+
 ofVec3f ofxOcean::floatingPosition(float u, float v, bool considerChoppy)
 {
     float xoffset = considerChoppy ? choppyOffset(u,v) : 0;

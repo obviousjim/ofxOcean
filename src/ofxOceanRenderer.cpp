@@ -15,22 +15,19 @@ ofxOceanRenderer::ofxOceanRenderer()
 	
     allocated = false;;
     ocean = NULL;
- 	bumpTexture = NULL;
     max_LOD = 4;
-    shaderLocation = "ocean"; //default to bin/data/ocean.(frag)(vert)
 	frameCount = 0;
-	reflectionTexture = NULL;
 	
-	reflectSquish = 1.0;
-	reflectOffset = ofVec2f(0,0);
+//	reflectSquish = 1.0;
+//	reflectOffset = ofVec2f(0,0);
 
 }
 
 ofxOceanRenderer::~ofxOceanRenderer()
 {
-    if(bumpTexture != NULL){
-        delete bumpTexture;
-    }
+//    if(bumpTexture != NULL){
+//        delete bumpTexture;
+//    }
     
     clearTiles();
 }
@@ -63,28 +60,16 @@ void ofxOceanRenderer::setup(ofxOcean* o, int tilesWide, int tilesTall)
 {
     
     clearTiles();
-    
+
     ocean = o;
     tiles_x = tilesWide;
     tiles_y = tilesTall;
     vertexCount = ocean->vertexCount;
     
-	hasShader = shaderLocation != "" && ofFile::doesFileExist(shaderLocation+".frag") && ofFile::doesFileExist(shaderLocation+".vert");
-    if(hasShader){
-		if(!oceanShader.load(shaderLocation)){
-			ofLog(OF_LOG_ERROR, "ofxOceanRenderer -- Shader load failed!");
-			hasShader = false;
-		}
-	}
-	else {
-		ofLog(OF_LOG_ERROR, "ofxOcean -- no shader?! " + shaderLocation);
-	}
-
-
     for(int i = 0; i < max_LOD; i++){
         tiles_LOD.push_back(vector<ofxOceanTile*>());
     }
-    GLint tangentAttributeLoc = oceanShader.getAttributeLocation("tangent");
+
     
 	ofxOceanTile* tile;
 	for (int y = 0; y < tiles_y; y++) {
@@ -96,7 +81,6 @@ void ofxOceanRenderer::setup(ofxOcean* o, int tilesWide, int tilesTall)
             
 			tile = new ofxOceanTile();
 			tile->position = ofVec3f(cx * ocean->size.x, -2.0 * chDist,  cy * ocean->size.z);
-            tile->tangentAttributeLoc = tangentAttributeLoc;
 			tiles_LOD[chDist].push_back(tile);
 		}
 	}
@@ -209,116 +193,38 @@ void ofxOceanRenderer::update()
     frameCount++;
 }
 
-void ofxOceanRenderer::setBumpTexture(string filename)
-{
-    if(bumpTexture != NULL){
-        delete bumpTexture;
-    }
-    bumpTexture = new ofImage();
-    bumpTexture->loadImage(filename);
-}
-
-void ofxOceanRenderer::setReflectionTexture(string filename)
-{
-	if(reflectionTexture != NULL){
-        delete reflectionTexture;
-    }
-	ofImage* newReflection = new ofImage();
-    newReflection->loadImage(filename);
-    reflectionTexture = newReflection;
-}
-
-void ofxOceanRenderer::setReflectionTexture(ofBaseHasTexture* rt)
-{
-	reflectionTexture = rt;
-}
-
 void ofxOceanRenderer::draw()
 {
-    glPushAttrib(GL_ENABLE_BIT);
-    glEnable(GL_DEPTH_TEST);
-    
-	/*
-    oceanShader.begin();
-    ofVec3f lightNormalized = lightDirection.normalized();
-    oceanShader.setUniform3f("sunDirection", lightNormalized.x, lightNormalized.y, lightNormalized.z);
-    oceanShader.setUniform1f("sunStrength", lightIntensity);
-    oceanShader.setUniform3f("centerPosition", lightPosition.x * getWidth(), 0, lightPosition.z * getHeight());
-	oceanShader.setUniform1f("brightness", brightness);
-	oceanShader.setUniform1f("contrast", contrast);
-
-    if(bumpTexture != NULL){
-		glActiveTexture(GL_TEXTURE0);
-		oceanShader.setUniform1i("bumpTex", 0);
-        oceanShader.setUniform1f("bumpScale", bumpScale);
-        oceanShader.setUniform1f("bumpSquish", bumpSquish);
-        oceanShader.setUniform1f("bumpBias", bumpBias);
-		
-        oceanShader.setUniform1f("bumpWidth", bumpTexture->getWidth());
-        oceanShader.setUniform1f("bumpHeight", bumpTexture->getHeight());
-
-        oceanShader.setUniform2f("bumpOffset", frameCount * bumpMoveSpeed.x * bumpScale, frameCount * bumpMoveSpeed.y * bumpScale);
-        oceanShader.setUniform2f("bumpWobble", sin(frameCount / bumpWobbleDamp.x)*bumpWobbleRange.x * bumpScale, 
-											   cos(frameCount / bumpWobbleDamp.y)*bumpWobbleRange.y * bumpScale);
-        bumpTexture->bind();        
-    }
-    
-	if(reflectionTexture != NULL){
-		glActiveTexture(GL_TEXTURE1);
-		oceanShader.setUniform1i("reflectTex", 1);
-		oceanShader.setUniform1f("reflectDistortion", reflectDistortion);
-		oceanShader.setUniform1f("reflectScale", reflectScale);
-		oceanShader.setUniform2f("reflectOffset", reflectOffset.x*reflectionTexture->getTextureReference().getWidth(), 
-												  reflectOffset.y*reflectionTexture->getTextureReference().getHeight());
-		oceanShader.setUniform1f("reflectSquish", reflectSquish);
-		oceanShader.setUniform1f("reflectWidth", reflectionTexture->getTextureReference().getWidth());
-		oceanShader.setUniform1f("reflectHeight", reflectionTexture->getTextureReference().getHeight());
-		
-		reflectionTexture->getTextureReference().bind();
-	}
-	*/
-
+//	ofPushMatrix();
+//	ofTranslate(ocean->cameraPosition);
 	for(int LOD = 0; LOD < max_LOD; LOD++) {
         for(int k = 0; k < tiles_LOD[LOD].size(); k++) {
             ofxOceanTile* tile = tiles_LOD[LOD][k];
             tile->draw();
         }
     }
-
-	
-//    if(reflectionTexture != NULL){
-//		glActiveTexture(GL_TEXTURE1);
-//		reflectionTexture->getTextureReference().unbind();
-//	}
-//	
-//    if(bumpTexture != NULL){
-//		glActiveTexture(GL_TEXTURE0);
-//        bumpTexture->unbind();
-//    }
+//	ofPopMatrix();
     
-    oceanShader.end();
-    
-	glPopAttrib();
 }
 
 void ofxOceanRenderer::drawWireframe(){
-    glPushAttrib(GL_ENABLE_BIT);
-    glEnable(GL_DEPTH_TEST);
     
+//	ofPushMatrix();
+//	ofTranslate(ocean->cameraPosition);
+	
 	for(int LOD = 0; LOD < max_LOD; LOD++) {
         for(int k = 0; k < tiles_LOD[LOD].size(); k++) {
             ofxOceanTile* tile = tiles_LOD[LOD][k];
             tile->drawWireframe();
         }
     }
-    
-	glPopAttrib();
+// 	ofPopMatrix();
 }
 
 void ofxOceanRenderer::drawVertices(){
-    glPushAttrib(GL_ENABLE_BIT);
-    glEnable(GL_DEPTH_TEST);
-    
+//	ofPushMatrix();
+//	ofTranslate(ocean->cameraPosition);
+
 	for(int LOD = 0; LOD < max_LOD; LOD++) {
         for(int k = 0; k < tiles_LOD[LOD].size(); k++) {
             ofxOceanTile* tile = tiles_LOD[LOD][k];
@@ -326,5 +232,5 @@ void ofxOceanRenderer::drawVertices(){
         }
     }
     
-	glPopAttrib();
+//	ofPopMatrix();
 }

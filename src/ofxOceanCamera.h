@@ -20,9 +20,11 @@ class ofxOceanCamera : public ofCamera {
 	void update();
 	float baseWidth;
 	float lift;
+	float heading;
 	
 	void drawDebug();
-	
+	float dampening;
+
   protected:
 	
 	ofVec3f frontBuoyant;

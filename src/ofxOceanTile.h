@@ -28,7 +28,7 @@ class ofxOceanTile
     
     int vertexcount;
     int indexcount;
-    GLint tangentAttributeLoc;
+    //GLint tangentAttributeLoc;
     
     ofVbo* mesh;
     

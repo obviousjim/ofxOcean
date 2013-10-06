@@ -51,7 +51,9 @@ class ofxOcean
 	int g_width;
     int g_height;
 	int vertexCount; // == g_width*g_height
-
+	
+	ofVec3f cameraPosition;
+	
     //use this to synchronize...
     void setFrameNum(int frameNum);
 

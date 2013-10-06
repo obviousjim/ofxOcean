@@ -161,10 +161,24 @@ void ofxOcean::setFrameNum(int _frameNum)
 void ofxOcean::update()
 {
     heightDenom = width*height+size.x*size.y;
+	ofVec3f centerOffset;
+	centerOffset.x = floor(cameraPosition.x/size.x) * size.x;
+	centerOffset.z = floor(cameraPosition.z/size.z) * size.z;
+	//	centerOffset.y = transform.position.y;
+	centerOffset.y = 0;
 
+	ofVec3f sampleOffset(fmod(cameraPosition.x ,size.x) / size.x * width,
+						 0,
+						 fmod(cameraPosition.z,size.z) / size.z * height);
+	if(sampleOffset.x < 0) sampleOffset.x += width;
+	if(sampleOffset.z < 0) sampleOffset.z += height;
+	
+//	cout << "sample offset is " << sampleOffset << endl;
+	int sampleOffsetX = fmod(float(cameraPosition.x/size.x), 1.0f) * width;
+	int sampleOffsetZ = fmod(float(cameraPosition.z/size.z), 1.0f) * height;
 	for (int y = 0;y < height; y++) {
 		for (int x = 0; x < width; x++) {
-			int idx = width * y + x;
+			int idx = width * y + x ;
 			int yc = y < height / 2 ? y : -height + y;
 			int xc = x < width / 2 ? x : -width + x;
 			ofVec2f vec_k = ofVec2f(2.0 * PI * xc / size.x, 2.0 * PI * yc / size.z);
@@ -186,9 +200,7 @@ void ofxOcean::update()
             }
 		}
 	}
-
-    //frameNum++;
-
+	
     IFF2(data);
     IFF2(t_x);
 
@@ -196,29 +208,34 @@ void ofxOcean::update()
 	float scaleB = -waveScale / (heightDenom);
 	float scaleBinv = 1.0 / scaleB;
 
-    for (int i = 0; i < width*height; i++) {
+//    for (int i = 0; i < width*height; i++) {
+	for (int y = 0;y < height; y++) {
+		for (int x = 0; x < width; x++) {
+			int i = width * y + x;
+			int iw = i+i/width;
+			
+//			if( y == width/2 && x == width/2) cout << "normal " << i << " offset " << j << endl;
+			
+			vertices[iw] = baseVertices[iw] + centerOffset;
+			vertices[iw].x += imag(data[i]) * scaleA;
+			vertices[iw].y  = real(data[i]) * scaleB;
 
-        int iw = i+i/width;
+			//cout << "vertex is " << vertices[iw].x << " " << vertices[iw].y << " " << vertices[iw].z << endl;
 
-        vertices[iw] = baseVertices[iw];
-        vertices[iw].x += imag(data[i]) * scaleA;
-        vertices[iw].y  = real(data[i]) * scaleB;
+			baseNormals[iw] = ofVec3f(real( t_x[i] ), scaleBinv, imag( t_x[i] )).normalized();
 
-        //cout << "vertex is " << vertices[iw].x << " " << vertices[iw].y << " " << vertices[iw].z << endl;
-
-        baseNormals[iw] = ofVec3f(real( t_x[i] ), scaleBinv, imag( t_x[i] )).normalized();
-
-        if (!((i+1) % width)) {
-            vertices[iw+1] = baseVertices[iw+1];
-            vertices[iw+1].x += imag(data[i+1-width]) * scaleA;
-            vertices[iw+1].y  = real(data[i+1-width]) * scaleB;
-            baseNormals[iw+1] = ofVec3f(real(t_x[i+1-width]), scaleBinv, imag( t_x[i+1-width])).normalized();
-        }
-    }
-
+			if (!((i+1) % width)) {
+				vertices[iw+1] = baseVertices[iw+1] + centerOffset;
+				vertices[iw+1].x += imag(data[i+1-width]) * scaleA;
+				vertices[iw+1].y  = real(data[i+1-width]) * scaleB;
+				baseNormals[iw+1] = ofVec3f(real(t_x[i+1-width]), scaleBinv, imag( t_x[i+1-width])).normalized();
+			}
+		}
+	}
+	
 	int offset = g_width*(g_height-1);
 	for (int i = 0; i < g_width; i++){
-		vertices[i+offset] = baseVertices[i+offset];
+		vertices[i+offset] = baseVertices[i+offset] + centerOffset;
 		vertices[i+offset].x += imag( data[i%width] ) * scaleA;
 		vertices[i+offset].y  = real( data[i%width] ) * scaleB;
 

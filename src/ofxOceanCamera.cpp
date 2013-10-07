@@ -22,41 +22,59 @@ void ofxOceanCamera::update(){
 		return;
 	}
 
-	float currentYRot = heading;
-	//currentYRot = 0;
-//	ofQuaternion currentOrientation = getOrientationQuat();
-	ofVec3f middle = getPosition();
-	ofVec3f front = middle + ofVec3f(0, 0, baseWidth).getRotated(currentYRot, ofVec3f(0,1,0));
-	ofVec3f back = middle + ofVec3f(0, 0, -baseWidth).getRotated(currentYRot, ofVec3f(0,1,0));
-	ofVec3f left = middle + ofVec3f(-baseWidth, 0, 0).getRotated(currentYRot, ofVec3f(0,1,0));
-	ofVec3f right = middle + ofVec3f(baseWidth, 0, 0).getRotated(currentYRot, ofVec3f(0,1,0));
 	
+	//these vectors are to the front and to the side of the current camera
+	ofVec3f frontDirection = ofVec3f(0, 0, 1).getRotated(heading, ofVec3f(0,1,0));
+	ofVec3f sideDirection = ofVec3f(1, 0, 0).getRotated(heading, ofVec3f(0,1,0));
+	
+	// get aactual positions in each 4 directions, the wider the base the more stable the camera will feel
+	ofVec3f middle = getPosition();
+	ofVec3f front = middle + frontDirection * baseWidth;
+	ofVec3f back  = middle - frontDirection * baseWidth;
+	ofVec3f left  = middle - sideDirection  * baseWidth;
+	ofVec3f right = middle + sideDirection  * baseWidth;
+	
+	//positions in height on the ocean
 	middleBuoyant = ocean->floatingPosition(middle,false);
 	frontBuoyant  = ocean->floatingPosition(front,false);
 	backBuoyant   = ocean->floatingPosition(back,false);
 	leftBuoyant   = ocean->floatingPosition(left,false);
 	rightBuoyant  = ocean->floatingPosition(right,false);
 
+	//based on the heights, find the orientation of the "raft"
 	ofVec3f rollDirection = rightBuoyant - leftBuoyant;
 	ofVec3f dipDirection =  frontBuoyant - backBuoyant;
 	upDirection = (rollDirection).getCrossed(dipDirection).normalized();
 	
 	//find the opposing angles
-	float lrAngle = ofVec3f(1,0,0).getRotated(currentYRot, ofVec3f(0,1,0)).angle(rollDirection);
+	float lrAngle = sideDirection.angle(rollDirection);
 	if(leftBuoyant.y > rightBuoyant.y) lrAngle *= -1;
 	ofQuaternion sideRotation;
-	sideRotation.makeRotate(lrAngle, 0, 0, 1);
+	sideRotation.makeRotate(lrAngle, frontDirection);
 
-	float fbAngle = ofVec3f(0,0,1).getRotated(currentYRot, ofVec3f(0,1,0)).angle(dipDirection);
+	float fbAngle = frontDirection.angle(dipDirection);
 	if(backBuoyant.y < frontBuoyant.y) fbAngle *= -1;
 	ofQuaternion frontRotation;
-	frontRotation.makeRotate(fbAngle, 1, 0, 0);
+	frontRotation.makeRotate(fbAngle, sideDirection);
 	
+	//set the position based on the middle, consider dampening
 	ofVec3f newPosition = middleBuoyant + ofVec3f(0,lift,0);
 	setPosition(getPosition() + (newPosition - getPosition()) * (1.0-dampening) );
 
+	//set the orientationb ased on the two angles
 	setOrientation(frontRotation * sideRotation);
-	rotate(currentYRot, ofVec3f(0,1,0));
+	rotate(heading, ofVec3f(0,1,0));
+	
+//	cout << "FRAME " << ofGetFrameNum() << endl;
+//	cout << "	y rot " << heading << endl;
+//	cout << "	sideDirection " << sideDirection << endl;
+//	cout << "	frontDirection " << frontDirection << endl;
+//	cout << "	rollDirection " << rollDirection << endl;
+//	cout << "	pitchDirection " << dipDirection << endl;
+//	cout << "	sideRotation " << sideRotation.getEuler() << endl;
+//	cout << "	frontRotation " << frontRotation.getEuler() << endl;
+//	cout << "	final position  " << getPosition() << endl;
+//	cout << "	final orientation  " << getOrientationEuler() << endl;
 
 }
 

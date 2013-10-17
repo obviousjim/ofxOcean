@@ -42,20 +42,25 @@ void ofxOceanCamera::update(){
 	rightBuoyant  = ocean->floatingPosition(right,false);
 
 	//based on the heights, find the orientation of the "raft"
-	ofVec3f rollDirection = rightBuoyant - leftBuoyant;
-	ofVec3f dipDirection =  frontBuoyant - backBuoyant;
+	ofVec3f rollDirection = (rightBuoyant - leftBuoyant).normalized();
+	ofVec3f dipDirection =  (frontBuoyant - backBuoyant).normalized();
 	upDirection = (rollDirection).getCrossed(dipDirection).normalized();
-	
+
+
+	ofQuaternion sideRotation;
 	//find the opposing angles
 	float lrAngle = sideDirection.angle(rollDirection);
-	if(leftBuoyant.y > rightBuoyant.y) lrAngle *= -1;
-	ofQuaternion sideRotation;
-	sideRotation.makeRotate(lrAngle, frontDirection);
+	if(lrAngle == lrAngle){ //check for NaN
+		if(leftBuoyant.y > rightBuoyant.y) lrAngle *= -1;
+		sideRotation.makeRotate(lrAngle, frontDirection);
+	}
 
-	float fbAngle = frontDirection.angle(dipDirection);
-	if(backBuoyant.y < frontBuoyant.y) fbAngle *= -1;
 	ofQuaternion frontRotation;
-	frontRotation.makeRotate(fbAngle, sideDirection);
+	float fbAngle = frontDirection.angle(dipDirection);
+	if(fbAngle == fbAngle){ //check for NaN
+		if(backBuoyant.y < frontBuoyant.y) fbAngle *= -1;
+		frontRotation.makeRotate(fbAngle, sideDirection);
+	}
 	
 	//set the position based on the middle, consider dampening
 	ofVec3f newPosition = middleBuoyant + ofVec3f(0,lift,0);
@@ -65,16 +70,16 @@ void ofxOceanCamera::update(){
 	setOrientation(frontRotation * sideRotation);
 	rotate(heading, ofVec3f(0,1,0));
 	
-//	cout << "FRAME " << ofGetFrameNum() << endl;
-//	cout << "	y rot " << heading << endl;
-//	cout << "	sideDirection " << sideDirection << endl;
-//	cout << "	frontDirection " << frontDirection << endl;
-//	cout << "	rollDirection " << rollDirection << endl;
-//	cout << "	pitchDirection " << dipDirection << endl;
-//	cout << "	sideRotation " << sideRotation.getEuler() << endl;
-//	cout << "	frontRotation " << frontRotation.getEuler() << endl;
-//	cout << "	final position  " << getPosition() << endl;
-//	cout << "	final orientation  " << getOrientationEuler() << endl;
+	cout << "FRAME " << ofGetFrameNum() << endl;
+	cout << "	y rot " << heading << endl;
+	cout << "	sideDirection " << sideDirection << endl;
+	cout << "	rollDirection " << rollDirection << endl;
+	cout << "	frontDirection " << frontDirection << endl;
+	cout << "	dipDirection " << dipDirection << endl;
+	cout << "	sideRotation " << sideRotation.getEuler() << endl;
+	cout << "	frontRotation " << frontRotation.getEuler() << endl;
+	cout << "	final position  " << getPosition() << endl;
+	cout << "	final orientation  " << getOrientationEuler() << endl;
 
 }
 

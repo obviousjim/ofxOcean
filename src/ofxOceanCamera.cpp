@@ -70,16 +70,16 @@ void ofxOceanCamera::update(){
 	setOrientation(frontRotation * sideRotation);
 	rotate(heading, ofVec3f(0,1,0));
 	
-	cout << "FRAME " << ofGetFrameNum() << endl;
-	cout << "	y rot " << heading << endl;
-	cout << "	sideDirection " << sideDirection << endl;
-	cout << "	rollDirection " << rollDirection << endl;
-	cout << "	frontDirection " << frontDirection << endl;
-	cout << "	dipDirection " << dipDirection << endl;
-	cout << "	sideRotation " << sideRotation.getEuler() << endl;
-	cout << "	frontRotation " << frontRotation.getEuler() << endl;
-	cout << "	final position  " << getPosition() << endl;
-	cout << "	final orientation  " << getOrientationEuler() << endl;
+//	cout << "FRAME " << ofGetFrameNum() << endl;
+//	cout << "	y rot " << heading << endl;
+//	cout << "	sideDirection " << sideDirection << endl;
+//	cout << "	rollDirection " << rollDirection << endl;
+//	cout << "	frontDirection " << frontDirection << endl;
+//	cout << "	dipDirection " << dipDirection << endl;
+//	cout << "	sideRotation " << sideRotation.getEuler() << endl;
+//	cout << "	frontRotation " << frontRotation.getEuler() << endl;
+//	cout << "	final position  " << getPosition() << endl;
+//	cout << "	final orientation  " << getOrientationEuler() << endl;
 
 }
 

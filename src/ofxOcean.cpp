@@ -67,12 +67,13 @@ ofxOcean::ofxOcean()
 ofxOcean::~ofxOcean()
 {
     if(allocated){
-        delete vertices;
-        delete baseUVs;
-        delete baseNormals;
-        delete baseTangents;
-        delete fftInputBuf;
-        delete fftOutputBuf;
+        delete[] vertices;
+        delete[] baseUVs;
+        delete[] baseNormals;
+        delete[] baseTangents;
+        delete[] fftInputBuf;
+        delete[] fftOutputBuf;
+        
     }
 }
 

@@ -21,9 +21,14 @@ ofxOceanTile::ofxOceanTile()
  
 ofxOceanTile::~ofxOceanTile()
 {
-    if(mesh != NULL){
-		delete mesh;
-	}
+
+    delete mesh;
+    
+    delete[] vertices;
+    delete[] normals;
+    delete[] uvs;
+    delete[] indeces;
+    delete[] tangents;
 }
 
 void ofxOceanTile::setup()
@@ -32,7 +37,9 @@ void ofxOceanTile::setup()
     mesh->setVertexData(vertices, vertexcount, GL_DYNAMIC_DRAW);
     mesh->setNormalData(normals, vertexcount, GL_DYNAMIC_DRAW);
     mesh->setTexCoordData(uvs, vertexcount, GL_STATIC_DRAW);
-    mesh->setIndexData(indeces, indexcount, GL_STATIC_DRAW);    
+    mesh->setIndexData(indeces, indexcount, GL_STATIC_DRAW);
+    
+    
 //    mesh->setAttributeData(tangentAttributeLoc, tangents, vertexcount, GL_DYNAMIC_DRAW);
 }
 
